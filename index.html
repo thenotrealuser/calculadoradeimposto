@@ -1,156 +1,128 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Impostos</title>
+    <title>Calculadora de Imposto</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+            padding: 20px;
         }
         table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 8px;
-            text-align: center;
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+            padding: 10px;
+            text-align: left;
         }
         th {
             background-color: #f2f2f2;
         }
-        input {
-            width: 100%;
-            padding: 5px;
-            box-sizing: border-box;
-        }
         .button {
+            padding: 10px;
             background-color: #4CAF50;
             color: white;
             border: none;
-            padding: 10px 20px;
             cursor: pointer;
         }
         .button:hover {
             background-color: #45a049;
         }
-        #resultado {
-            margin-top: 20px;
-            font-weight: bold;
+        .remove-button {
+            background-color: #f44336;
+        }
+        .remove-button:hover {
+            background-color: #da190b;
         }
     </style>
 </head>
 <body>
-    <h1>Calculadora de Impostos</h1>
+    <h2>Calculadora de Imposto</h2>
     
-    <!-- Tabela para entrada de produtos -->
-    <table>
+    <label for="total-compra">Total da compra (R$):</label>
+    <input type="number" id="total-compra" placeholder="Ex: 187,47" step="0.01">
+    <br><br>
+    <label for="total-imposto">Valor total do imposto (R$):</label>
+    <input type="number" id="total-imposto" placeholder="Ex: 62,05" step="0.01">
+    <br><br>
+    
+    <h3>Produtos</h3>
+    <table id="produtos-table">
         <thead>
             <tr>
-                <th>Nome do Produto</th>
+                <th>Nome</th>
                 <th>Preço (R$)</th>
                 <th>Quantidade</th>
+                <th>Ações</th>
             </tr>
         </thead>
-        <tbody id="produtos">
+        <tbody>
             <tr>
-                <td><input type="text" class="nome"></td>
-                <td><input type="number" class="preco" step="0.01" min="0"></td>
-                <td><input type="number" class="quantidade" step="1" min="1"></td>
+                <td><input type="text" class="produto-nome" placeholder="Nome do produto"></td>
+                <td><input type="number" class="produto-preco" placeholder="Preço" step="0.01"></td>
+                <td><input type="number" class="produto-quantidade" placeholder="Quantidade" step="1" value="1"></td>
+                <td><button class="button" onclick="removerProduto(this)">Remover</button></td>
             </tr>
         </tbody>
     </table>
+    <button class="button" onclick="adicionarProduto()">Adicionar produto</button>
     
-    <!-- Botão para adicionar mais produtos -->
-    <button class="button" onclick="adicionarProduto()">Adicionar Produto</button>
+    <br><br>
+    <button class="button" onclick="calcularImposto()">Calcular Imposto</button>
 
-    <!-- Entrada para valores totais -->
-    <div>
-        <label for="total-compra">Total da compra (R$):</label>
-        <input type="number" id="total-compra" step="0.01" min="0"><br><br>
-
-        <label for="valor-imposto">Valor total do imposto (R$):</label>
-        <input type="number" id="valor-imposto" step="0.01" min="0"><br><br>
-
-        <label for="total-cartao">Total no cartão (opcional, R$):</label>
-        <input type="number" id="total-cartao" step="0.01" min="0">
-    </div><br>
-
-    <!-- Botão para calcular -->
-    <button class="button" onclick="calcularImpostos()">Calcular</button>
-
-    <!-- Resultado -->
-    <div id="resultado"></div>
+    <h3>Imposto por produto (unidade):</h3>
+    <ul id="resultado-imposto"></ul>
 
     <script>
-        // Função para adicionar uma nova linha na tabela de produtos
         function adicionarProduto() {
-            const tabela = document.getElementById('produtos');
-            const novaLinha = document.createElement('tr');
+            const tabela = document.getElementById("produtos-table").getElementsByTagName('tbody')[0];
+            const novaLinha = tabela.insertRow();
             novaLinha.innerHTML = `
-                <td><input type="text" class="nome"></td>
-                <td><input type="number" class="preco" step="0.01" min="0"></td>
-                <td><input type="number" class="quantidade" step="1" min="1"></td>
+                <td><input type="text" class="produto-nome" placeholder="Nome do produto"></td>
+                <td><input type="number" class="produto-preco" placeholder="Preço" step="0.01"></td>
+                <td><input type="number" class="produto-quantidade" placeholder="Quantidade" step="1" value="1"></td>
+                <td><button class="button remove-button" onclick="removerProduto(this)">Remover</button></td>
             `;
-            tabela.appendChild(novaLinha);
         }
 
-        // Função para calcular impostos e taxas
-        function calcularImpostos() {
-            const nomes = Array.from(document.querySelectorAll('.nome')).map(input => input.value.trim());
-            const precos = Array.from(document.querySelectorAll('.preco')).map(input => parseFloat(input.value) || 0);
-            const quantidades = Array.from(document.querySelectorAll('.quantidade')).map(input => parseInt(input.value) || 0);
+        function removerProduto(button) {
+            const row = button.closest('tr');
+            row.remove();
+        }
 
-            const totalCompra = parseFloat(document.getElementById('total-compra').value) || 0;
-            const valorImposto = parseFloat(document.getElementById('valor-imposto').value) || 0;
-            const totalCartao = parseFloat(document.getElementById('total-cartao').value) || 0;
+        function calcularImposto() {
+            const totalCompra = parseFloat(document.getElementById("total-compra").value);
+            const totalImposto = parseFloat(document.getElementById("total-imposto").value);
+            const produtos = document.querySelectorAll("#produtos-table tbody tr");
 
-            // Validação dos dados
-            if (nomes.length === 0 || precos.some(p => p <= 0) || quantidades.some(q => q <= 0)) {
-                alert('Preencha todos os campos corretamente!');
-                return;
-            }
-            if (totalCompra <= 0 || valorImposto <= 0) {
-                alert('Informe o total da compra e o valor do imposto!');
-                return;
-            }
+            const resultadoImposto = document.getElementById("resultado-imposto");
+            resultadoImposto.innerHTML = ""; // Limpa o resultado anterior
 
-            // Cálculo
-            const resultadoDiv = document.getElementById('resultado');
-            resultadoDiv.innerHTML = ''; // Limpa resultados anteriores
             let totalProdutos = 0;
 
-            // Calcula o valor total dos produtos
-            precos.forEach((preco, i) => {
-                totalProdutos += preco * quantidades[i];
+            // Calcular o valor total dos produtos
+            produtos.forEach(produto => {
+                const nome = produto.querySelector(".produto-nome").value;
+                const preco = parseFloat(produto.querySelector(".produto-preco").value);
+                const quantidade = parseInt(produto.querySelector(".produto-quantidade").value);
+                
+                if (!nome || !preco || !quantidade) return; // Se algum valor faltar, ignora esse produto
+
+                totalProdutos += preco * quantidade;
+
+                const impostoPorProduto = (preco * quantidade * totalImposto) / totalCompra;
+
+                // Exibir o imposto por produto
+                const itemResultado = document.createElement("li");
+                itemResultado.textContent = `${nome}: R$ ${impostoPorProduto.toFixed(2)} por unidade.`;
+                resultadoImposto.appendChild(itemResultado);
             });
 
-            // Processa cada produto
-            nomes.forEach((nome, i) => {
-                const preco = precos[i];
-                const quantidade = quantidades[i];
-                const totalProduto = preco * quantidade;
-                const porcentagem = totalProduto / totalProdutos;
-
-                // Cálculo do imposto e taxas
-                const impostoTotalProduto = porcentagem * valorImposto;
-                const impostoPorUnidade = impostoTotalProduto / quantidade;
-                let resultado = `${nome} (por unidade): Imposto R$ ${impostoPorUnidade.toFixed(2)}`;
-
-                if (totalCartao > 0) {
-                    const taxaCartao = totalCartao - totalCompra;
-                    const taxaProduto = porcentagem * taxaCartao;
-                    const taxaPorUnidade = taxaProduto / quantidade;
-                    resultado += `, Taxa Cartão R$ ${taxaPorUnidade.toFixed(2)}`;
-                }
-
-                resultadoDiv.innerHTML += `<p>${resultado}</p>`;
-            });
+            if (totalProdutos > 0) {
+                alert(`Imposto calculado para os produtos. Total de produtos: R$ ${totalProdutos.toFixed(2)}`);
+            } else {
+                alert("Por favor, preencha corretamente os campos dos produtos.");
+            }
         }
     </script>
 </body>
