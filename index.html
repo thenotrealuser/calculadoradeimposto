@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Imposto By Kimi Morgam</title>
+    <title>Calculadora de Imposto</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -46,8 +46,8 @@
     <input type="number" id="total-imposto" placeholder="Ex: 62,05" step="0.01">
     <br><br>
     
-    <label for="taxa-cartao">Taxa do cartão (se aplicável):</label>
-    <input type="number" id="taxa-cartao" placeholder="Ex: 5,00" step="0.01">
+    <label for="taxa-cartao">Taxa do cartão (se aplicável) (%):</label>
+    <input type="number" id="taxa-cartao" placeholder="Ex: 5" step="0.01">
     <br><br>
     
     <h3>Produtos</h3>
@@ -100,7 +100,7 @@
         function calcularImposto() {
             const totalCompra = parseFloat(document.getElementById("total-compra").value);
             const totalImposto = parseFloat(document.getElementById("total-imposto").value);
-            const taxaCartao = parseFloat(document.getElementById("taxa-cartao").value);
+            const taxaCartao = parseFloat(document.getElementById("taxa-cartao").value) / 100; // Convertendo para percentual
             const produtos = document.querySelectorAll("#produtos-table tbody tr");
 
             const resultadoImposto = document.getElementById("resultado-imposto");
@@ -119,9 +119,26 @@
                 if (!nome || !preco || !quantidade) return; // Se algum valor faltar, ignora esse produto
 
                 totalProdutos += preco * quantidade;
+            });
+
+            if (totalProdutos <= 0) {
+                alert("Por favor, preencha corretamente os campos dos produtos.");
+                return;
+            }
+
+            // Calcular a taxa do cartão sobre o total da compra
+            const taxaCartaoTotal = totalCompra * taxaCartao;
+
+            // Calcular o imposto e a taxa do cartão por produto
+            produtos.forEach(produto => {
+                const nome = produto.querySelector(".produto-nome").value;
+                const preco = parseFloat(produto.querySelector(".produto-preco").value);
+                const quantidade = parseInt(produto.querySelector(".produto-quantidade").value);
+
+                if (!nome || !preco || !quantidade) return; // Se algum valor faltar, ignora esse produto
 
                 const impostoPorProduto = (preco * quantidade * totalImposto) / totalCompra;
-                const taxaCartaoPorProduto = (preco * quantidade * (taxaCartao / 100));
+                const taxaCartaoPorProduto = (preco * quantidade * taxaCartaoTotal) / totalProdutos;
 
                 // Exibir o imposto por produto
                 const itemResultadoImposto = document.createElement("li");
@@ -134,11 +151,7 @@
                 resultadoCartao.appendChild(itemResultadoCartao);
             });
 
-            if (totalProdutos > 0) {
-                alert(`Imposto e Taxa do Cartão calculados para os produtos. Total de produtos: R$ ${totalProdutos.toFixed(2)}`);
-            } else {
-                alert("Por favor, preencha corretamente os campos dos produtos.");
-            }
+            alert(`Imposto e Taxa do Cartão calculados para os produtos. Total de produtos: R$ ${totalProdutos.toFixed(2)}`);
         }
     </script>
 </body>
