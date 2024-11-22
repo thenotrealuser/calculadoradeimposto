@@ -74,10 +74,10 @@
     <br><br>
     <button class="button" onclick="calcularImposto()">Calcular Imposto</button>
 
-    <h3>Imposto por produto (unidade):</h3>
+    <h3>Imposto por unidade:</h3>
     <ul id="resultado-imposto"></ul>
 
-    <h3>Taxa do Cartão por produto (unidade):</h3>
+    <h3>Taxa do Cartão por unidade:</h3>
     <ul id="resultado-cartao"></ul>
 
     <script>
@@ -129,7 +129,7 @@
             // Calcular o valor da taxa do cartão, baseado na diferença entre totalCompra e totalCartao
             const taxaCartaoTotal = totalCartao - totalCompra;
 
-            // Calcular o imposto e a taxa do cartão por produto
+            // Calcular o imposto e a taxa do cartão por unidade de produto
             produtos.forEach(produto => {
                 const nome = produto.querySelector(".produto-nome").value;
                 const preco = parseFloat(produto.querySelector(".produto-preco").value);
@@ -140,19 +140,22 @@
                 // Calcular o valor total do produto (preço x quantidade)
                 const valorProdutoTotal = preco * quantidade;
 
-                // Calcular o imposto proporcional por produto
+                // Calcular o imposto unitário
                 const impostoPorProduto = (valorProdutoTotal * totalImposto) / totalCompra;
+
+                // Calcular a taxa do cartão unitária
                 const taxaCartaoPorProduto = (valorProdutoTotal * taxaCartaoTotal) / totalProdutos;
 
-                // Exibir o imposto por produto
-                const itemResultadoImposto = document.createElement("li");
-                itemResultadoImposto.textContent = `${nome}: R$ ${impostoPorProduto.toFixed(2)} de imposto por unidade.`;
-                resultadoImposto.appendChild(itemResultadoImposto);
+                // Adicionar o imposto e a taxa do cartão para cada unidade
+                for (let i = 0; i < quantidade; i++) {
+                    const itemResultadoImposto = document.createElement("li");
+                    itemResultadoImposto.textContent = `${nome} (unidade ${i + 1}): R$ ${impostoPorProduto.toFixed(2)} de imposto.`;
+                    resultadoImposto.appendChild(itemResultadoImposto);
 
-                // Exibir a taxa do cartão por produto
-                const itemResultadoCartao = document.createElement("li");
-                itemResultadoCartao.textContent = `${nome}: R$ ${taxaCartaoPorProduto.toFixed(2)} de taxa do cartão por unidade.`;
-                resultadoCartao.appendChild(itemResultadoCartao);
+                    const itemResultadoCartao = document.createElement("li");
+                    itemResultadoCartao.textContent = `${nome} (unidade ${i + 1}): R$ ${taxaCartaoPorProduto.toFixed(2)} de taxa do cartão.`;
+                    resultadoCartao.appendChild(itemResultadoCartao);
+                }
             });
 
             alert(`Imposto e Taxa do Cartão calculados para os produtos. Total de produtos: R$ ${totalProdutos.toFixed(2)}`);
