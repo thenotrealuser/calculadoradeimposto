@@ -112,11 +112,10 @@
 
             // Calcular o valor total dos produtos
             produtos.forEach(produto => {
-                const nome = produto.querySelector(".produto-nome").value;
                 const preco = parseFloat(produto.querySelector(".produto-preco").value);
                 const quantidade = parseInt(produto.querySelector(".produto-quantidade").value);
                 
-                if (!nome || !preco || !quantidade) return; // Se algum valor faltar, ignora esse produto
+                if (!preco || !quantidade) return; // Se faltar preço ou quantidade, ignora
 
                 totalProdutos += preco * quantidade;
             });
@@ -126,7 +125,7 @@
                 return;
             }
 
-            // Calcular o valor da taxa do cartão, baseado na diferença entre totalCompra e totalCartao
+            // Calcular a taxa do cartão com base no valor total da compra
             const taxaCartaoTotal = totalCartao - totalCompra;
 
             // Calcular o imposto e a taxa do cartão por unidade de produto
@@ -135,30 +134,27 @@
                 const preco = parseFloat(produto.querySelector(".produto-preco").value);
                 const quantidade = parseInt(produto.querySelector(".produto-quantidade").value);
 
-                if (!nome || !preco || !quantidade) return; // Se algum valor faltar, ignora esse produto
+                if (!nome || !preco || !quantidade) return; // Se faltar alguma informação, ignora o produto
 
-                // Calcular o valor total do produto (preço x quantidade)
-                const valorProdutoTotal = preco * quantidade;
+                // Calcular o imposto por unidade
+                const impostoUnitario = (preco * totalImposto) / totalCompra;
 
-                // Calcular o imposto unitário
-                const impostoPorProduto = (valorProdutoTotal * totalImposto) / totalCompra;
+                // Calcular a taxa do cartão por unidade
+                const taxaCartaoUnitaria = (preco * taxaCartaoTotal) / totalProdutos;
 
-                // Calcular a taxa do cartão unitária
-                const taxaCartaoPorProduto = (valorProdutoTotal * taxaCartaoTotal) / totalProdutos;
-
-                // Adicionar o imposto e a taxa do cartão para cada unidade
+                // Adicionar o imposto e a taxa para cada unidade
                 for (let i = 0; i < quantidade; i++) {
                     const itemResultadoImposto = document.createElement("li");
-                    itemResultadoImposto.textContent = `${nome} (unidade ${i + 1}): R$ ${impostoPorProduto.toFixed(2)} de imposto.`;
+                    itemResultadoImposto.textContent = `${nome} (unidade ${i + 1}): R$ ${impostoUnitario.toFixed(2)} de imposto.`;
                     resultadoImposto.appendChild(itemResultadoImposto);
 
                     const itemResultadoCartao = document.createElement("li");
-                    itemResultadoCartao.textContent = `${nome} (unidade ${i + 1}): R$ ${taxaCartaoPorProduto.toFixed(2)} de taxa do cartão.`;
+                    itemResultadoCartao.textContent = `${nome} (unidade ${i + 1}): R$ ${taxaCartaoUnitaria.toFixed(2)} de taxa do cartão.`;
                     resultadoCartao.appendChild(itemResultadoCartao);
                 }
             });
 
-            alert(`Imposto e Taxa do Cartão calculados para os produtos. Total de produtos: R$ ${totalProdutos.toFixed(2)}`);
+            alert("Cálculos realizados com sucesso!");
         }
     </script>
 </body>
