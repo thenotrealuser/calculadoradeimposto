@@ -46,8 +46,8 @@
     <input type="number" id="total-imposto" placeholder="Ex: 62,05" step="0.01">
     <br><br>
     
-    <label for="taxa-cartao">Taxa do cartão (se aplicável) (%):</label>
-    <input type="number" id="taxa-cartao" placeholder="Ex: 5" step="0.01">
+    <label for="total-cartao">Valor total via cartão (R$):</label>
+    <input type="number" id="total-cartao" placeholder="Ex: 192,49" step="0.01">
     <br><br>
     
     <h3>Produtos</h3>
@@ -100,7 +100,7 @@
         function calcularImposto() {
             const totalCompra = parseFloat(document.getElementById("total-compra").value);
             const totalImposto = parseFloat(document.getElementById("total-imposto").value);
-            const taxaCartao = parseFloat(document.getElementById("taxa-cartao").value) / 100; // Convertendo para percentual
+            const totalCartao = parseFloat(document.getElementById("total-cartao").value);
             const produtos = document.querySelectorAll("#produtos-table tbody tr");
 
             const resultadoImposto = document.getElementById("resultado-imposto");
@@ -126,8 +126,8 @@
                 return;
             }
 
-            // Calcular a taxa do cartão sobre o total da compra
-            const taxaCartaoTotal = totalCompra * taxaCartao;
+            // Calcular o valor da taxa do cartão, baseado na diferença entre totalCompra e totalCartao
+            const taxaCartaoTotal = totalCartao - totalCompra;
 
             // Calcular o imposto e a taxa do cartão por produto
             produtos.forEach(produto => {
