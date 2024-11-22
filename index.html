@@ -137,8 +137,12 @@
 
                 if (!nome || !preco || !quantidade) return; // Se algum valor faltar, ignora esse produto
 
-                const impostoPorProduto = (preco * quantidade * totalImposto) / totalCompra;
-                const taxaCartaoPorProduto = (preco * quantidade * taxaCartaoTotal) / totalProdutos;
+                // Calcular o valor total do produto (preço x quantidade)
+                const valorProdutoTotal = preco * quantidade;
+
+                // Calcular o imposto proporcional por produto
+                const impostoPorProduto = (valorProdutoTotal * totalImposto) / totalCompra;
+                const taxaCartaoPorProduto = (valorProdutoTotal * taxaCartaoTotal) / totalProdutos;
 
                 // Exibir o imposto por produto
                 const itemResultadoImposto = document.createElement("li");
